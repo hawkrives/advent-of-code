@@ -47,7 +47,7 @@ def main():
   
   potential = collections.defaultdict(list)
   
-  for bid in sorted(bus_ids):
+  for bid in bus_ids:
     departures = range(ts - (ts % bid), ts + bid, bid)
     
     for d in departures:

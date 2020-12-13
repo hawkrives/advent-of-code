@@ -67,6 +67,7 @@ def main():
   print('wait', to_wait)
   print('answer', best_bid * to_wait)
 
+
 if __name__ == '__main__':
   with timed():
     main()

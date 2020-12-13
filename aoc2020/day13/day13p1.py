@@ -45,7 +45,7 @@ def main():
   ts, bus_ids = load()
   print('ts:', ts)
   
-  potential = collections.defaultdict(list)
+  potential = dict()
   
   for bid in bus_ids:
     departures = range(ts - (ts % bid), ts + bid, bid)
@@ -54,13 +54,11 @@ def main():
       if d < ts:
         continue
       
-      potential[d].append(bid)
-
-  #print(potential)
+      potential[d] = bid
   
   nearest = min((p for p in potential.keys()), key=lambda p: p - ts)
   
-  best_bid = potential[nearest][0]
+  best_bid = potential[nearest]
   to_wait = nearest - ts
   
   print('route', best_bid)

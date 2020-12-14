@@ -66,18 +66,16 @@ def load():
     if lhs == 'mask':
       mask = Mask(rhs)
     else:
+      # find the address
       index = int(lhs[4:-1])
-      #print(rhs)
+      # convert the rhs into a base-2 string
       rhs = bin(int(rhs, base=10))[2:]
-      #orhs = rhs
+      # apply the current mask to the value
       rhs = mask.apply(rhs)
-      #print(orhs.rjust(36, '0'))
-      #print(mask.mask)
-      #print(rhs)
+      # convert the value into an integer
       value = int(rhs, base=2)
+      # return it
       yield Assign(index, value)
-    
-    #yield lhs, rhs
 
 
 def main():
@@ -88,7 +86,8 @@ def main():
     memory[inst.index] = inst.value
   
   #print(memory)
-  print(sum(memory.values()))
+  s = sum(memory.values())
+  print(f'{s:,}')
 
 
 if __name__ == '__main__':

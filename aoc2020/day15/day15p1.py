@@ -1,10 +1,5 @@
-from pathlib import Path
-import collections
-import enum
-import attr
 from contextlib import contextmanager
 import time
-import itertools
 
 
 @contextmanager
@@ -24,10 +19,6 @@ def evaluate(starting):
     # and we need to know the most recent two turns on which the it was said
     turns_spoken = history.setdefault(last_spoken, [])
 
-    #print(history)
-    #print(turns_spoken)
-    #print(last_spoken)
-
     if len(turns_spoken) < 2:
       value = 0
     else:
@@ -35,9 +26,6 @@ def evaluate(starting):
     
     last_spoken = value
     history.setdefault(last_spoken, []).append(turn)
-    
-    #print('said', last_spoken)
-    #print()
 
   return last_spoken
 
@@ -65,4 +53,3 @@ if __name__ == '__main__':
   input = (15,5,1,4,7,0)
   with timed(str(input)):
     print(evaluate(input))
-

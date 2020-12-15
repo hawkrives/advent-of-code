@@ -13,18 +13,16 @@ class Mask:
 
   def apply(self, value: str):
     value = value.rjust(36, '0')
-    #value = value[-36:]
     value = [ch for ch in value]
     for i, bit in enumerate(self.mask):
       if bit == 'X':
         continue
-      
-      #print(i, len(value))
+
       value[i] = bit
-      
+
     value = ''.join(value)
     value = value.lstrip('0')
-    
+
     return value
 
 
@@ -32,7 +30,6 @@ class Mask:
 class Assign:
   index: int
   value: int
-  #mask: Mask
 
 
 @contextmanager
@@ -57,7 +54,6 @@ def parse(datafile):
 def load():
   datafile = Path('./sample.txt')
   datafile = Path('./data.txt')
-  #datafile = Path('./data-drew.txt')
 
   mask = Mask('X' * 36)
   for line in parse(datafile):
@@ -80,11 +76,11 @@ def load():
 
 def main():
   data = load()
-  
+
   memory = {}
   for inst in data:
     memory[inst.index] = inst.value
-  
+
   #print(memory)
   s = sum(memory.values())
   print(f'{s:,}')

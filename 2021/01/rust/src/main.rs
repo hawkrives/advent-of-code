@@ -6,15 +6,27 @@ const EXAMPLE_DATA: &'static str = include_str!("../input.example.txt");
 
 fn main() {
     println!("Part 1:");
-    let sample_1 = p01::analyze_measurements(EXAMPLE_DATA);
-    println!("Sample: expected {}, got {}", 7, sample_1);
-    let actual_1 = p01::analyze_measurements(INPUT_DATA);
-    println!("Actual: expected {}, got {}", 1692, actual_1);
+
+    let expected = 7;
+    let actual = p01::analyze_measurements(EXAMPLE_DATA);
+    let status = if expected == actual { "ok." } else { "error!" };
+    println!("Sample: {} - expected {}, got {}", status, expected, actual);
+
+    let expected = 1692;
+    let actual = p01::analyze_measurements(INPUT_DATA);
+    let status = if expected == actual { "ok." } else { "error!" };
+    println!("Actual: {} - expected {}, got {}", status, expected, actual);
+
     println!();
 
     println!("Part 2:");
-    let sample_2 = p02::analyze_measurements(EXAMPLE_DATA);
-    println!("Sample: expected {}, got {}", 5, sample_2);
-    let actual_2 = p02::analyze_measurements(INPUT_DATA);
-    println!("Actual: expected {}, got {}", 1724, actual_2);
+    let expected = 5;
+    let actual = p02::analyze_measurements(EXAMPLE_DATA);
+    let status = if expected == actual { "ok." } else { "error!" };
+    println!("Sample: {} - expected {}, got {}", status, expected, actual);
+
+    let expected = 1724;
+    let actual = p02::analyze_measurements(INPUT_DATA);
+    let status = if expected == actual { "ok." } else { "error!" };
+    println!("Actual: {} - expected {}, got {}", status, expected, actual);
 }

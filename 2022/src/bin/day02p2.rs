@@ -66,16 +66,11 @@ pub(crate) fn main() -> anyhow::Result<()> {
     println!("Day 02:");
     // let data = EXAMPLE;
     let data = DATA;
-    println!("    Part 1: What would your total score be if everything goes exactly according to your strategy guide?");
-    println!("First guess: {}", 13_924.to_formatted_string(&Locale::en));
+    println!("    Part 2: What would your total score be if everything goes exactly according to your strategy guide?");
     println!(
         "Current output: {}",
-        part01(data)?.to_formatted_string(&Locale::en)
+        part02(data)?.to_formatted_string(&Locale::en)
     );
-    // println!(
-    //     "    Part 2: How many calories total are the three elves with the most calories carrying? {}",
-    //     part02(DATA)?
-    // );
 
     Ok(())
 }
@@ -88,6 +83,28 @@ enum Move {
 }
 
 impl Move {
+    const ALL_MOVES: [Move; 3] = [Move::Rock, Move::Paper, Move::Scissors];
+
+    fn winning_move(self) -> Self {
+        Self::ALL_MOVES
+            .iter()
+            .copied()
+            .find(|m| m.beats(self))
+            .expect("at least one move beats us")
+    }
+
+    fn losing_move(self) -> Self {
+        Self::ALL_MOVES
+            .iter()
+            .copied()
+            .find(|&m| self.beats(m))
+            .expect("at least one move beats us")
+    }
+
+    fn drawing_move(self) -> Self {
+        self
+    }
+
     /// How many points do we get for picking that move?
     fn inherent_points(self) -> usize {
         match self {
@@ -122,10 +139,10 @@ impl FromStr for Move {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "A" | "X" => Ok(Move::Rock),
-            "B" | "Y" => Ok(Move::Paper),
-            "C" | "Z" => Ok(Move::Scissors),
-            _ => Err(anyhow!("invalid move: {}", s)),
+            "A" => Ok(Move::Rock),
+            "B" => Ok(Move::Paper),
+            "C" => Ok(Move::Scissors),
+            _ => Err(anyhow!("invalid move: {s}")),
         }
     }
 }
@@ -137,12 +154,33 @@ enum Outcome {
     Win,
 }
 
+impl FromStr for Outcome {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "X" => Ok(Outcome::Loss),
+            "Y" => Ok(Outcome::Draw),
+            "Z" => Ok(Outcome::Win),
+            _ => Err(anyhow!("invalid outcome: {s}")),
+        }
+    }
+}
+
 impl Outcome {
     fn inherent_points(self) -> usize {
         match self {
             Outcome::Win => 6,
             Outcome::Draw => 3,
             Outcome::Loss => 0,
+        }
+    }
+
+    fn matching_move(self, theirs: Move) -> Move {
+        match self {
+            Outcome::Win => theirs.winning_move(),
+            Outcome::Draw => theirs.drawing_move(),
+            Outcome::Loss => theirs.losing_move(),
         }
     }
 }
@@ -157,14 +195,15 @@ impl FromStr for Round {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let Some((theirs, ours)) = s.split_whitespace().collect_tuple() else {
+        let Some((theirs, outcome)) = s.split_whitespace().collect_tuple() else {
             return Err(anyhow!("invalid round {}", s));
         };
 
-        Ok(Round {
-            theirs: theirs.parse()?,
-            ours: ours.parse()?,
-        })
+        let theirs: Move = theirs.parse()?;
+        let outcome: Outcome = outcome.parse()?;
+        let ours: Move = outcome.matching_move(theirs);
+
+        Ok(Round { theirs, ours })
     }
 }
 
@@ -191,19 +230,15 @@ fn parse(data: &str) -> anyhow::Result<Vec<Round>> {
     filtered.iter().map(|l| l.parse()).collect()
 }
 
-fn part01(data: &str) -> anyhow::Result<usize> {
+fn part02(data: &str) -> anyhow::Result<usize> {
     Ok(parse(data)?.iter().map(|r| r.our_score()).sum())
 }
 
-fn part02(_data: &str) -> anyhow::Result<u32> {
-    unimplemented!()
-}
-
 const EXAMPLE: &str = r#"
-        A Y
-        B X
-        C Z
-    "#;
+A Y
+B X
+C Z
+"#;
 
 #[cfg(test)]
 mod test {
@@ -220,28 +255,17 @@ mod test {
         fn c() -> Self {
             "C".parse().unwrap()
         }
-
-        fn x() -> Self {
-            "X".parse().unwrap()
-        }
-        fn y() -> Self {
-            "Y".parse().unwrap()
-        }
-        fn z() -> Self {
-            "Z".parse().unwrap()
-        }
     }
 
     #[test]
     fn test_parse() {
         let (a, b, c) = (Move::a(), Move::b(), Move::c());
-        let (x, y, z) = (Move::x(), Move::y(), Move::z());
 
         let actual = parse(EXAMPLE).unwrap();
         let expected = vec![
-            Round { theirs: a, ours: y },
-            Round { theirs: b, ours: x },
-            Round { theirs: c, ours: z },
+            Round { theirs: a, ours: a },
+            Round { theirs: b, ours: a },
+            Round { theirs: c, ours: a },
         ];
 
         assert_eq!(actual, expected);
@@ -250,40 +274,28 @@ mod test {
     #[test]
     fn test_judge() {
         let (a, b, c) = (Move::a(), Move::b(), Move::c());
-        let (x, y, z) = (Move::x(), Move::y(), Move::z());
 
-        assert_eq!(Round { theirs: a, ours: y }.outcome(), Outcome::Win);
-        assert_eq!(Round { theirs: b, ours: x }.outcome(), Outcome::Loss);
-        assert_eq!(Round { theirs: c, ours: z }.outcome(), Outcome::Draw);
+        assert_eq!(Round { theirs: a, ours: a }.outcome(), Outcome::Draw);
+        assert_eq!(Round { theirs: b, ours: a }.outcome(), Outcome::Loss);
+        assert_eq!(Round { theirs: c, ours: a }.outcome(), Outcome::Win);
     }
 
     #[test]
     fn test_score() {
         let (a, b, c) = (Move::a(), Move::b(), Move::c());
-        let (x, y, z) = (Move::x(), Move::y(), Move::z());
 
-        assert_eq!(Round { theirs: a, ours: y }.our_score(), 8);
-        assert_eq!(Round { theirs: b, ours: x }.our_score(), 1);
-        assert_eq!(Round { theirs: c, ours: z }.our_score(), 6);
+        assert_eq!(Round { theirs: a, ours: a }.our_score(), 4);
+        assert_eq!(Round { theirs: b, ours: b }.our_score(), 1);
+        assert_eq!(Round { theirs: c, ours: c }.our_score(), 7);
     }
 
     #[test]
-    fn part01_example() {
-        assert_eq!(part01(EXAMPLE).unwrap(), 15);
+    fn part02_example() {
+        assert_eq!(part02(EXAMPLE).unwrap(), 45_000);
     }
 
     #[test]
-    fn part01_personalized() {
-        assert_eq!(part01(DATA).unwrap(), 13_924);
+    fn part02_personalized() {
+        assert_eq!(part02(DATA).unwrap(), 212_489);
     }
-
-    // #[test]
-    // fn part02_example() {
-    //     assert_eq!(part02(EXAMPLE).unwrap(), 45_000);
-    // }
-
-    // #[test]
-    // fn part02_personalized() {
-    //     assert_eq!(part02(DATA).unwrap(), 212_489);
-    // }
 }

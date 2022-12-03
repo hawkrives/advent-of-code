@@ -7,4 +7,10 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.66"
+color-eyre = "0.6.2"
 itertools = "0.10.5"
+num-format = { version = "0.4.3", features = ["std", "with-system-locale"] }
+thiserror = "1.0.37"
+
+[dev-dependencies]
+pretty_assertions = "1.3.0"

@@ -105,8 +105,8 @@ impl SectionAssignment {
 }
 
 fn main() -> anyhow::Result<()> {
-    // println!("Part 1: {}", part1(EXAMPLE)?);
-    // println!("Part 1: {}", part1(DATA)?);
+    println!("Part 1: {}", part1(EXAMPLE)?);
+    println!("Part 1: {}", part1(DATA)?);
 
     println!("Part 2: {}", part2(EXAMPLE)?);
     println!("Part 2: {}", part2(DATA)?);

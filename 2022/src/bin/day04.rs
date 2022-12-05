@@ -95,12 +95,7 @@ impl SectionAssignment {
     }
 
     fn partial_overlap(&self) -> bool {
-        let does_overlap = self.0.partial_overlap(&self.1) || self.1.overlapped(&self.0);
-
-        let o = if does_overlap { "y" } else { "n" };
-        println!("{} {}", o, self);
-        println!();
-        does_overlap
+        self.0.partial_overlap(&self.1) || self.1.overlapped(&self.0)
     }
 }
 

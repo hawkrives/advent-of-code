@@ -141,8 +141,13 @@ mod test {
         assert_eq!(part1(DATA).unwrap(), 657);
     }
 
-    // #[test]
-    // fn test_part2_example() {
-    //     assert_eq!(part2(EXAMPLE), 70);
-    // }
+    #[test]
+    fn test_part2_example() {
+        assert_eq!(part2(EXAMPLE).unwrap(), 70);
+    }
+
+    #[test]
+    fn test_part2_data() {
+        assert_eq!(part2(DATA).unwrap(), 938);
+    }
 }
